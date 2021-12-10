@@ -1,5 +1,4 @@
 from typing import Union
-from managed_classses import LineItem
 
 
 def cls_name(inst_or_cls: Union[object, type]) -> str:
