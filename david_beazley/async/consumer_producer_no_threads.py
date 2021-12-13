@@ -89,7 +89,7 @@ class AsyncQueue:
         self._waiting.append(lambda: self.get(callback))
 
 
-def producer(schler: Scheduler, aqu: AsyncQueue, amount: int) -> None:
+def producer_call_back_based(schler: Scheduler, aqu: AsyncQueue, amount: int) -> None:
     def _produce(n):
         if n <= amount:
             print(f'Produced {n}')
@@ -106,12 +106,12 @@ def producer(schler: Scheduler, aqu: AsyncQueue, amount: int) -> None:
     _produce(0)
 
 
-def consumer(schler: Scheduler, aqu: AsyncQueue) -> None:
+def consumer_call_back_based(schler: Scheduler, aqu: AsyncQueue) -> None:
     def _consume(result_from_producer):
         try:
             item = result_from_producer.get_result()
             print(f'Consumed {item}')
-            schler.call_soon(lambda: consumer(schler, aqu))
+            schler.call_soon(lambda: consumer_call_back_based(schler, aqu))
         except QueueClosed:
             print(f'Queue appeared to be closed. Consumer done.')
 
@@ -122,9 +122,9 @@ if __name__ == '__main__':
     scheduler = Scheduler()
     q = AsyncQueue(scheduler)
     scheduler.call_soon(
-        lambda: producer(scheduler, q, 10)
+        lambda: producer_call_back_based(scheduler, q, 10)
     )
     scheduler.call_soon(
-        lambda: consumer(scheduler, q)
+        lambda: consumer_call_back_based(scheduler, q)
     )
     scheduler.run()
